@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Investment Tax Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-group {
+            margin-bottom: 0.75rem;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+            color: #4A5568;
+            font-size: 0.875rem;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 0.375rem;
+            transition: border-color 0.2s;
+            font-size: 0.875rem;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #4299E1;
+            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+        }
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        @media (max-width: 640px) {
+            .input-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            .result-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 0.75rem 0;
+            }
+            .result-item span:last-child {
+                text-align: left;
+                min-width: auto;
+                margin-top: 0.25rem;
+                font-size: 1rem;
+            }
+            .section-header h3 {
+                font-size: 0.95rem;
+            }
+            .card {
+                padding: 1rem;
+            }
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #E2E8F0;
+            margin-bottom: 0.75rem;
+            transition: background-color 0.2s;
+        }
+        .section-header:hover {
+            background-color: #F7FAFC;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .section-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2D3748;
+            margin: 0;
+        }
+        .collapse-icon {
+            transition: transform 0.2s;
+            font-size: 0.875rem;
+            color: #718096;
+        }
+        .collapse-icon.rotated {
+            transform: rotate(180deg);
+        }
+        .collapsible-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .collapsible-content.collapsed {
+            max-height: 0;
+            margin-bottom: 0;
+        }
+        .btn-primary {
+            background-color: #4299E1;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background-color: #3182CE;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #F7FAFC;
+            font-size: 0.875rem;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-item span:first-child {
+            font-weight: 500;
+            color: #4A5568;
+            flex: 1;
+        }
+        .result-item span:last-child {
+            font-weight: 600;
+            color: #1A202C;
+            text-align: right;
+            min-width: 120px;
+        }
+        .result-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #E2E8F0;
+        }
+        .result-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .result-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2D3748;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .highlight {
+            background-color: #EBF8FF;
+            color: #2B6CB0;
+            font-weight: 700 !important;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            border: 2px solid #BEE3F8;
+        }
+        .highlight span:first-child {
+            color: #2B6CB0 !important;
+        }
+        .sub-item {
+            padding-left: 1rem;
+            font-size: 0.8rem;
+            border-bottom: 1px solid #F7FAFC;
+        }
+        .sub-item span:first-child {
+            color: #718096;
+            font-weight: 400;
+        }
+        .sub-item span:last-child {
+            color: #4A5568;
+            font-weight: 500;
+        }
+        .total-item {
+            font-weight: 700;
+            border-top: 2px solid #2D3748;
+            margin-top: 0.5rem;
+            padding-top: 0.75rem;
+            background-color: #F7FAFC;
+            padding: 0.75rem 0.5rem;
+            border-radius: 0.375rem;
+        }
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none; /* Initially hidden */
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #718096;
+        }
+        .explanation-item h4 {
+            font-weight: 700;
+            color: #2D3748;
+            margin-top: 1rem;
+        }
+        .explanation-item p {
+            font-size: 0.9rem;
+            color: #4A5568;
+            margin-top: 0.25rem;
+        }
+        .explanation-item code {
+            background-color: #F7FAFC;
+            border: 1px solid #E2E8F0;
+            padding: 0.1rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-4">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Solar Investment Tax Calculator</h1>
+            <p class="text-gray-600 mt-2">Analyze tax savings and find your optimal equity contribution.</p>
+        </header>
+
+        <div class="text-center mb-8">
+            <button id="openModalBtn" class="text-blue-600 hover:underline font-medium">
+                How are these numbers calculated? Learn more...
+            </button>
+        </div>
+
+        <!-- Main Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: Inputs -->
+            <div class="lg:col-span-1">
+                <div class="card space-y-4 lg:sticky lg:top-8">
+                    <div>
+                        <h2 class="text-lg font-semibold border-b pb-2 mb-4">Core Assumptions</h2>
+                        
+                        <!-- Income Sources Section -->
+                        <div class="section-header" onclick="toggleSection('income-section')">
+                            <h3>💼 Income Sources</h3>
+                            <span class="collapse-icon rotated" id="income-icon">▶</span>
+                        </div>
+                        <div class="collapsible-content collapsed" id="income-section">
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="wages">Wages</label>
+                                    <input type="number" id="wages" value="0">
+                                </div>
+                                <div class="input-group">
+                                    <label for="sCorpIncome">S-Corp Income</label>
+                                    <input type="number" id="sCorpIncome" value="1500000">
+                                </div>
+                            </div>
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="interestDividends">Interest & Dividends</label>
+                                    <input type="number" id="interestDividends" value="0">
+                                </div>
+                                <div class="input-group">
+                                    <label for="capitalGains">Capital Gains</label>
+                                    <input type="number" id="capitalGains" value="0">
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="k1mhp">K-1 MHP Income</label>
+                                <input type="number" id="k1mhp" value="0">
+                            </div>
+                        </div>
+                        
+                        <!-- Tax Rates Section -->
+                        <div class="section-header" onclick="toggleSection('tax-section')">
+                            <h3>📊 Tax Rates</h3>
+                            <span class="collapse-icon rotated" id="tax-icon">▶</span>
+                        </div>
+                        <div class="collapsible-content collapsed" id="tax-section">
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="federalTaxRate">Federal Rate (%)</label>
+                                    <input type="number" id="federalTaxRate" value="37" step="0.1">
+                                </div>
+                                <div class="input-group">
+                                    <label for="stateTaxRate">State Rate (%)</label>
+                                    <input type="number" id="stateTaxRate" value="6" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-lg font-semibold border-b pb-2 mb-4">⚙️ Deal Structure</h2>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="leverageRatio">Leverage Ratio</label>
+                                <input type="number" id="leverageRatio" value="2.668143" step="0.01">
+                            </div>
+                            <div class="input-group">
+                                <label for="itcRate">ITC Rate (%)</label>
+                                <input type="number" id="itcRate" value="30" step="1">
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="itcLiabilityCapRate">ITC Cap Rate (%)</label>
+                                <input type="number" id="itcLiabilityCapRate" value="75" step="1">
+                            </div>
+                            <div class="input-group">
+                                <label for="stateDepreciationRate">State Depreciation (%)</label>
+                                <input type="number" id="stateDepreciationRate" value="20" step="1">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="investmentReturnRate">Investment Return Rate (%)</label>
+                            <input type="number" id="investmentReturnRate" value="8" step="0.1">
+                        </div>
+                    </div>
+                    
+                    <button id="calculateBtn" class="btn-primary">Calculate Optimal Investment</button>
+                </div>
+            </div>
+
+            <!-- Right Column: Results -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Scenario 1: 100% Bonus Depreciation -->
+                <div class="card">
+                    <h2 class="text-2xl font-bold mb-4">Scenario 1: 100% Bonus Depreciation</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div id="results100">
+                           <!-- Results will be injected here -->
+                        </div>
+                        <div class="w-full h-64 md:h-full">
+                            <canvas id="chart100"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenario 2: Custom Bonus Depreciation -->
+                <div class="card">
+                    <div class="flex flex-wrap justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold">Scenario 2: Custom Bonus Depreciation</h2>
+                        <div class="flex items-center space-x-2 mt-2 sm:mt-0">
+                             <label for="bonusDepreciationRateCustom" class="font-medium">Bonus Rate:</label>
+                             <input type="number" id="bonusDepreciationRateCustom" value="40" class="w-24 p-2 border rounded-md">
+                             <span>%</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                         <div id="resultsCustom">
+                            <!-- Results will be injected here -->
+                         </div>
+                         <div class="w-full h-64 md:h-full">
+                             <canvas id="chartCustom"></canvas>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- 20-Year Investment Projection -->
+                <div class="card">
+                    <h2 class="text-2xl font-bold mb-4">📈 20-Year Investment Projection</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div id="results20Year">
+                            <!-- 20-year results will be injected here -->
+                        </div>
+                        <div class="w-full h-64 md:h-full">
+                            <canvas id="chart20Year"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Explanation Modal -->
+    <div id="explanationModal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="closeModalBtn" class="modal-close">&times;</span>
+            <h2 class="text-2xl font-bold mb-4 border-b pb-2">Understanding the Calculations</h2>
+
+            <div class="explanation-item">
+                <h3 class="text-xl font-semibold mt-2 mb-2 text-gray-800">How Accuracy is Verified</h3>
+                <p>The calculator's accuracy relies on the formulas and inputs you provide. It solves a complex circular reference problem: the tax credit depends on tax liability, but the liability is reduced by depreciation, which is affected by the credit.
+                </p>
+                <p class="mt-2">To solve this, the calculator runs a rapid, 10-step iterative simulation for each potential investment. It starts with an initial tax liability, calculates the corresponding credit and depreciation, then recalculates the liability, and repeats. This process quickly converges to a stable, equilibrium point where the numbers are consistent and accurate based on the given inputs.
+                </p>
+            </div>
+             <div class="explanation-item">
+                <h3 class="text-xl font-semibold mt-4 mb-2 text-gray-800 border-t pt-4">Core Assumptions Explained</h3>
+                <h4>Pre-Investment Taxable Income</h4>
+                <p><strong>What it means:</strong> This is the total taxable income from all sources *before* any solar-related deductions are applied. It serves as the baseline for calculating your potential tax liability.</p>
+                <p><strong>How it's calculated:</strong> <code>Wages + S-Corp Income + Interest & Dividends + Capital Gains + K-1 MHP Income</code></p>
+                <p class="mt-2"><strong>Important Note:</strong> For simplicity, this calculator applies a single federal and state tax rate to this total income. It does not differentiate between ordinary income and capital gains tax rates. The purpose is to model the specific impact of the solar investment, not to serve as a comprehensive tax filing tool.</p>
+            </div>
+            
+            <div class="explanation-item">
+                <h3 class="text-xl font-semibold mt-4 mb-2 text-gray-800 border-t pt-4">Output Explanations</h3>
+                <h4>Total Asset Value</h4>
+                <p><strong>What it means:</strong> The total cost of the solar project, including both your cash and the borrowed amount (Note Payable).</p>
+                <p><strong>How it's calculated:</strong> <code>Cash Contribution * Leverage Ratio</code></p>
+                
+                <h4>Cash Contribution (Equity)</h4>
+                <p><strong>What it means:</strong> The actual cash you invest from your own funds. The calculator finds the optimal value for this to maximize your Net Cash Savings.</p>
+                
+                <h4>Note Payable</h4>
+                <p><strong>What it means:</strong> The portion of the project cost that is financed through debt (a loan).</p>
+                <p><strong>How it's calculated:</strong> <code>Total Asset Value - Cash Contribution</code></p>
+                
+                <h4>Adjusted Gross Income (AGI)</h4>
+                <p><strong>What it means:</strong> Your new federal taxable income after deducting the solar depreciation. A lower AGI results in a lower federal tax bill before credits.</p>
+                <p><strong>How it's calculated:</strong> <code>Pre-Investment Taxable Income - Solar Credit Depreciation</code></p>
+                
+                <h4>Solar Credit Depreciation (Federal)</h4>
+                <p><strong>What it means:</strong> A large, immediate federal tax deduction based on the value of the solar assets. This model uses bonus depreciation for an accelerated deduction.</p>
+                <p><strong>How it's calculated:</strong> <code>(Total Asset Value - Other Adjustments) * Bonus Depreciation Rate</code></p>
+
+                <h4>Solar Credit Depreciation (State)</h4>
+                <p><strong>What it means:</strong> The tax deduction allowed by the state based on the value of the solar asset. Unlike the federal government, many states do not allow for accelerated bonus depreciation and instead use a standard schedule (e.g., 5-year straight line, which is 20% per year).</p>
+                <p><strong>How it's calculated:</strong> <code>Total Asset Value * State Depreciation Rate</code></p>
+                
+                <h4>Other Adjustments (Basis Reduction)</h4>
+                <p><strong>What it means:</strong> The IRS requires that the depreciable value (basis) of the asset be reduced by half of the Investment Tax Credit (ITC) you receive.</p>
+                <p><strong>How it's calculated:</strong> <code>FED Tax Credit - Solar * 0.5</code></p>
+
+                <h4>FED Tax Credit - Solar (ITC)</h4>
+                <p><strong>What it means:</strong> A powerful dollar-for-dollar reduction of your federal tax liability, based on the cost of the solar project.</p>
+                <p><strong>How it's calculated:</strong> It's the <strong>lesser</strong> of the potential credit (<code>Total Asset Value * ITC Rate</code>) and the maximum allowed credit (<code>Updated Federal Tax Liability * ITC Liability Cap Rate</code>).</p>
+                
+                <h4>Federal Tax Savings</h4>
+                <p><strong>What it means:</strong> The total reduction in your federal tax bill. This is calculated by comparing your original tax liability to your new, lower liability after all deductions and credits are applied.</p>
+                <p><strong>How it's calculated:</strong> <code>(Pre-Investment Income * Federal Tax Rate) - (New Federal Tax Liability - FED Tax Credit)</code></p>
+
+                <h4>State Tax Savings</h4>
+                <p><strong>What it means:</strong> The reduction in your state tax bill, which in this model is driven by the state's depreciation allowance for the solar asset.</p>
+                <p><strong>How it's calculated:</strong> <code>(Total Asset Value * State Depreciation Rate) * State Tax Rate</code></p>
+
+                <h4>Total Tax Savings</h4>
+                <p><strong>What it means:</strong> The total combined reduction in both your federal and state tax bills resulting from the investment.</p>
+                <p><strong>How it's calculated:</strong> <code>Federal Tax Savings + State Tax Savings</code></p>
+
+                <h4>Net Cash Savings</h4>
+                <p><strong>What it means:</strong> The ultimate financial benefit in the first year. It's the total tax savings minus your initial cash investment. This is the key metric the calculator optimizes for.</p>
+                <p><strong>How it's calculated:</strong> <code>Total Tax Savings - Cash Contribution</code></p>
+
+                <h4>Federal Taxes Due</h4>
+                <p><strong>What it means:</strong> The final amount of federal tax you will owe after all solar-related deductions and credits have been applied.</p>
+                <p><strong>How it's calculated:</strong> <code>(Adjusted Gross Income * Federal Tax Rate) - FED Tax Credit - Solar</code></p>
+
+                <h4>State Taxes Due</h4>
+                <p><strong>What it means:</strong> The final amount of state tax you will owe after the state's solar depreciation deduction has been applied.</p>
+                <p><strong>How it's calculated:</strong> <code>(Pre-Investment Income - Solar Credit Depreciation (State)) * State Tax Rate</code></p>
+
+                <h4>Total Taxes Due</h4>
+                <p><strong>What it means:</strong> The combined total of your final federal and state tax bills after all solar-related benefits.</p>
+                <p><strong>How it's calculated:</strong> <code>Federal Taxes Due + State Taxes Due</code></p>
+            </div>
+
+            <div class="explanation-item">
+                <h3 class="text-xl font-semibold mt-4 mb-2 text-gray-800 border-t pt-4">20-Year Investment Projection</h3>
+                <h4>Future Value of Net Cash Savings</h4>
+                <p><strong>What it means:</strong> This shows what your Net Cash Savings would be worth after 20 years if invested at the specified return rate, using compound interest.</p>
+                <p><strong>How it's calculated:</strong> <code>Net Cash Savings * (1 + Investment Return Rate)^20</code></p>
+                
+                <h4>Tax on Note Payable</h4>
+                <p><strong>What it means:</strong> The potential tax liability on the Note Payable amount at your current tax rate. This represents a future obligation that should be considered when evaluating the long-term benefits.</p>
+                <p><strong>How it's calculated:</strong> <code>Note Payable * (Federal Tax Rate + State Tax Rate)</code></p>
+                
+                <h4>Net 20-Year Projection</h4>
+                <p><strong>What it means:</strong> The final projected value after 20 years, accounting for both the growth of your invested cash savings and the tax obligation on the note.</p>
+                <p><strong>How it's calculated:</strong> <code>Future Value of Net Cash Savings - Tax on Note Payable</code></p>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- DOM Elements ---
+    const calculateBtn = document.getElementById('calculateBtn');
+    
+    // Inputs
+    const wagesEl = document.getElementById('wages');
+    const sCorpIncomeEl = document.getElementById('sCorpIncome');
+    const interestDividendsEl = document.getElementById('interestDividends');
+    const capitalGainsEl = document.getElementById('capitalGains');
+    const k1mhpEl = document.getElementById('k1mhp');
+    const federalTaxRateEl = document.getElementById('federalTaxRate');
+    const stateTaxRateEl = document.getElementById('stateTaxRate');
+    const leverageRatioEl = document.getElementById('leverageRatio');
+    const itcRateEl = document.getElementById('itcRate');
+    const itcLiabilityCapRateEl = document.getElementById('itcLiabilityCapRate');
+    const stateDepreciationRateEl = document.getElementById('stateDepreciationRate');
+    const bonusDepreciationRateCustomEl = document.getElementById('bonusDepreciationRateCustom');
+    const investmentReturnRateEl = document.getElementById('investmentReturnRate');
+
+    // Outputs
+    const results100El = document.getElementById('results100');
+    const resultsCustomEl = document.getElementById('resultsCustom');
+    const results20YearEl = document.getElementById('results20Year');
+    const chart100El = document.getElementById('chart100');
+    const chartCustomEl = document.getElementById('chartCustom');
+    const chart20YearEl = document.getElementById('chart20Year');
+
+    // Modal elements
+    const modal = document.getElementById('explanationModal');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    // --- Collapsible Section Functionality ---
+    function toggleSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        const icon = document.getElementById(sectionId.replace('-section', '-icon'));
+        
+        if (section.classList.contains('collapsed')) {
+            section.classList.remove('collapsed');
+            icon.classList.remove('rotated');
+            icon.textContent = '▼';
+        } else {
+            section.classList.add('collapsed');
+            icon.classList.add('rotated');
+            icon.textContent = '▶';
+        }
+    }
+
+    // Make toggleSection available globally
+    window.toggleSection = toggleSection;
+
+
+    let chart100, chartCustom, chart20Year;
+
+    // --- Formatting Helper ---
+    const currencyFormatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+
+    // --- 20-Year Investment Calculations ---
+    function calculateFutureValue(principal, annualRate, years) {
+        return principal * Math.pow(1 + annualRate, years);
+    }
+
+    function calculateNoteTax(notePayable, federalRate, stateRate) {
+        return notePayable * (federalRate + stateRate);
+    }
+
+    function calculate20YearProjection(netCashSavings, notePayable, investmentReturnRate, federalTaxRate, stateTaxRate) {
+        const futureValue = calculateFutureValue(netCashSavings, investmentReturnRate, 20);
+        const noteTax = calculateNoteTax(notePayable, federalTaxRate, stateTaxRate);
+        const net20YearValue = futureValue - noteTax;
+        
+        return {
+            futureValue,
+            noteTax,
+            net20YearValue
+        };
+    }
+
+    // --- Core Calculation Logic (Ported from Python) ---
+    function calculateSolarSavings(equityContribution, bonusDepreciationRate, inputs) {
+        const {
+            PRE_INVESTMENT_TAXABLE_INCOME, FEDERAL_TAX_RATE, STATE_TAX_RATE,
+            LEVERAGE_RATIO, ITC_RATE, ITC_LIABILITY_CAP_RATE, STATE_DEPRECIATION_RATE
+        } = inputs;
+
+        const total_assets = equityContribution * LEVERAGE_RATIO;
+        const notePayable = total_assets - equityContribution;
+        const potential_itc = total_assets * ITC_RATE;
+
+        // Iteratively solve for the stable ITC and Tax Liability
+        let current_federal_liability = PRE_INVESTMENT_TAXABLE_INCOME * FEDERAL_TAX_RATE;
+        let final_itc_taken = 0;
+        let final_federal_depreciation = 0;
+        let final_basis_reduction = 0;
+        let final_new_taxable_income = 0;
+
+        for (let i = 0; i < 10; i++) { // 10 iterations is sufficient for convergence
+            const itc_cap = current_federal_liability * ITC_LIABILITY_CAP_RATE;
+            const itc_taken = Math.min(potential_itc, itc_cap);
+            
+            const basis_reduction = 0.5 * itc_taken;
+            const depreciable_basis = total_assets - basis_reduction;
+            
+            const federal_depreciation_deduction = depreciable_basis * bonusDepreciationRate;
+            
+            const new_taxable_income = PRE_INVESTMENT_TAXABLE_INCOME - federal_depreciation_deduction;
+            current_federal_liability = new_taxable_income * FEDERAL_TAX_RATE;
+            
+            final_itc_taken = itc_taken;
+            final_federal_depreciation = federal_depreciation_deduction;
+            final_basis_reduction = basis_reduction;
+            final_new_taxable_income = new_taxable_income;
+        }
+
+        // Final Calculation of savings
+        const baseline_federal_liability = PRE_INVESTMENT_TAXABLE_INCOME * FEDERAL_TAX_RATE;
+        const final_federal_liability_after_credit = current_federal_liability - final_itc_taken;
+        
+        const federal_tax_savings = baseline_federal_liability - final_federal_liability_after_credit;
+        
+        // State Tax Savings Calculation
+        const state_depreciation_deduction = total_assets * STATE_DEPRECIATION_RATE;
+        const state_tax_savings = state_depreciation_deduction * STATE_TAX_RATE;
+        
+        const total_tax_savings = federal_tax_savings + state_tax_savings;
+        const net_cash_savings = total_tax_savings - equityContribution;
+
+        // Final tax liability calculations
+        const final_state_tax_due = (PRE_INVESTMENT_TAXABLE_INCOME - state_depreciation_deduction) * STATE_TAX_RATE;
+        const total_taxes_due = final_federal_liability_after_credit + final_state_tax_due;
+
+        
+        return {
+            "Equity Contribution": equityContribution,
+            "Note Payable": notePayable,
+            "Total Asset Value": total_assets,
+            "Adjusted Gross Income (AGI)": final_new_taxable_income,
+            "Solar Credit Depreciation": final_federal_depreciation,
+            "State Solar Depreciation": state_depreciation_deduction,
+            "Other Adjustments": final_basis_reduction,
+            "FED Tax Credit - Solar": final_itc_taken,
+            "Federal Tax Savings": federal_tax_savings,
+            "State Tax Savings": state_tax_savings,
+            "Total Tax Savings": total_tax_savings,
+            "Net Cash Savings": net_cash_savings,
+            "Federal Taxes Due": final_federal_liability_after_credit,
+            "State Taxes Due": final_state_tax_due,
+            "Total Taxes Due": total_taxes_due
+        };
+    }
+
+    function findOptimalInvestment(bonusDepreciationRate, inputs) {
+        // Test investments from $10k up to a reasonable cap based on income
+        const investmentRangeMax = Math.max(500000, inputs.PRE_INVESTMENT_TAXABLE_INCOME / 2);
+        const step = 1000;
+        const results = [];
+
+        for (let equity = 10000; equity <= investmentRangeMax; equity += step) {
+            const result = calculateSolarSavings(equity, bonusDepreciationRate, inputs);
+            results.push(result);
+        }
+        
+        if (results.length === 0) return { optimalPoint: null, allResults: [] };
+
+        // Find the row with the highest "Net Cash Savings"
+        const optimalPoint = results.reduce((max, current) => 
+            current["Net Cash Savings"] > max["Net Cash Savings"] ? current : max, results[0]
+        );
+        
+        return { optimalPoint, allResults: results };
+    }
+
+    // --- UI Update Functions ---
+    function displayResults(element, optimalPoint) {
+        if (!optimalPoint) {
+            element.innerHTML = `<p class="text-red-500">Could not calculate optimal point.</p>`;
+            return;
+        }
+        
+        element.innerHTML = `
+            <div class="result-section">
+                <h3>💰 Optimal Investment</h3>
+                <div class="result-item">
+                    <span>Total Asset Value</span>
+                    <span>${currencyFormatter.format(optimalPoint["Total Asset Value"])}</span>
+                </div>
+                <div class="result-item highlight">
+                    <span>Cash Contribution</span>
+                    <span>${currencyFormatter.format(optimalPoint["Equity Contribution"])}</span>
+                </div>
+                <div class="result-item sub-item">
+                    <span>↳ Note Payable</span>
+                    <span>${currencyFormatter.format(optimalPoint["Note Payable"])}</span>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <h3>📊 Tax Impact Details</h3>
+                <div class="result-item">
+                    <span>Adjusted Gross Income (AGI)</span>
+                    <span>${currencyFormatter.format(optimalPoint["Adjusted Gross Income (AGI)"])}</span>
+                </div>
+                <div class="result-item">
+                    <span>Federal Solar Depreciation</span>
+                    <span>${currencyFormatter.format(optimalPoint["Solar Credit Depreciation"])}</span>
+                </div>
+                <div class="result-item">
+                    <span>State Solar Depreciation</span>
+                    <span>${currencyFormatter.format(optimalPoint["State Solar Depreciation"])}</span>
+                </div>
+                <div class="result-item sub-item">
+                    <span>↳ Basis Adjustments</span>
+                    <span>${currencyFormatter.format(optimalPoint["Other Adjustments"])}</span>
+                </div>
+                <div class="result-item">
+                    <span>Federal Tax Credit (ITC)</span>
+                    <span>${currencyFormatter.format(optimalPoint["FED Tax Credit - Solar"])}</span>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <h3>🎯 Financial Outcome</h3>
+                <div class="result-item">
+                    <span>Federal Tax Savings</span>
+                    <span>${currencyFormatter.format(optimalPoint["Federal Tax Savings"])}</span>
+                </div>
+                <div class="result-item">
+                    <span>State Tax Savings</span>
+                    <span>${currencyFormatter.format(optimalPoint["State Tax Savings"])}</span>
+                </div>
+                <div class="result-item">
+                    <span>Total Tax Savings</span>
+                    <span>${currencyFormatter.format(optimalPoint["Total Tax Savings"])}</span>
+                </div>
+                <div class="result-item highlight">
+                    <span>💵 Net Cash Savings</span>
+                    <span>${currencyFormatter.format(optimalPoint["Net Cash Savings"])}</span>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <h3>💸 Final Tax Liability</h3>
+                <div class="result-item">
+                    <span>Federal Taxes Due</span>
+                    <span>${currencyFormatter.format(optimalPoint["Federal Taxes Due"])}</span>
+                </div>
+                <div class="result-item">
+                    <span>State Taxes Due</span>
+                    <span>${currencyFormatter.format(optimalPoint["State Taxes Due"])}</span>
+                </div>
+                <div class="result-item total-item">
+                    <span>Total Taxes Due</span>
+                    <span>${currencyFormatter.format(optimalPoint["Total Taxes Due"])}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function display20YearResults(element, optimalPoint, inputs) {
+        if (!optimalPoint) {
+            element.innerHTML = `<p class="text-red-500">Could not calculate 20-year projection.</p>`;
+            return;
+        }
+
+        const investmentReturnRate = parseFloat(investmentReturnRateEl.value) / 100;
+        const projection = calculate20YearProjection(
+            optimalPoint["Net Cash Savings"],
+            optimalPoint["Note Payable"],
+            investmentReturnRate,
+            inputs.FEDERAL_TAX_RATE,
+            inputs.STATE_TAX_RATE
+        );
+
+        element.innerHTML = `
+            <div class="result-section">
+                <h3>📈 20-Year Growth Analysis</h3>
+                <div class="result-item">
+                    <span>Initial Net Cash Savings</span>
+                    <span>${currencyFormatter.format(optimalPoint["Net Cash Savings"])}</span>
+                </div>
+                <div class="result-item">
+                    <span>Annual Return Rate</span>
+                    <span>${(investmentReturnRate * 100).toFixed(1)}%</span>
+                </div>
+                <div class="result-item highlight">
+                    <span>Future Value (20 years)</span>
+                    <span>${currencyFormatter.format(projection.futureValue)}</span>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <h3>💸 Tax Considerations</h3>
+                <div class="result-item">
+                    <span>Note Payable Amount</span>
+                    <span>${currencyFormatter.format(optimalPoint["Note Payable"])}</span>
+                </div>
+                <div class="result-item">
+                    <span>Combined Tax Rate</span>
+                    <span>${((inputs.FEDERAL_TAX_RATE + inputs.STATE_TAX_RATE) * 100).toFixed(1)}%</span>
+                </div>
+                <div class="result-item">
+                    <span>Tax on Note Payable</span>
+                    <span>${currencyFormatter.format(projection.noteTax)}</span>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <h3>🎯 Net 20-Year Outcome</h3>
+                <div class="result-item total-item highlight">
+                    <span>Net 20-Year Value</span>
+                    <span>${currencyFormatter.format(projection.net20YearValue)}</span>
+                </div>
+                <div class="result-item sub-item">
+                    <span>↳ Growth Multiple</span>
+                    <span>${(projection.net20YearValue / Math.max(optimalPoint["Net Cash Savings"], 1)).toFixed(1)}x</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderChart(chartInstance, canvasEl, allResults, optimalPoint) {
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+        
+        const labels = allResults.map(r => r["Equity Contribution"]);
+        const data = allResults.map(r => r["Net Cash Savings"]);
+
+        const optimalIndex = allResults.findIndex(r => r["Equity Contribution"] === optimalPoint["Equity Contribution"]);
+
+        const pointBackgroundColors = labels.map((_, index) => index === optimalIndex ? 'red' : 'rgba(66, 153, 225, 0.6)');
+        const pointRadii = labels.map((_, index) => index === optimalIndex ? 6 : 3);
+
+
+        return new Chart(canvasEl.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Net Cash Savings',
+                    data: data,
+                    borderColor: '#4299E1',
+                    backgroundColor: 'rgba(66, 153, 225, 0.2)',
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: pointBackgroundColors,
+                    pointRadius: pointRadii,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Equity Contribution' },
+                        ticks: {
+                             callback: value => currencyFormatter.format(labels[value]).replace('.00', '')
+                        }
+                    },
+                    y: {
+                        title: { display: true, text: 'Net Cash Savings' },
+                        ticks: {
+                             callback: value => currencyFormatter.format(value)
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += currencyFormatter.format(context.parsed.y);
+                                }
+                                return label;
+                            },
+                             title: function(context) {
+                                return `Equity: ${currencyFormatter.format(context[0].label)}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function render20YearChart(chartInstance, canvasEl, optimalPoint, inputs) {
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        if (!optimalPoint) return null;
+
+        const investmentReturnRate = parseFloat(investmentReturnRateEl.value) / 100;
+        const years = [];
+        const values = [];
+        
+        // Calculate values for each year from 0 to 20
+        for (let year = 0; year <= 20; year++) {
+            years.push(year);
+            const futureValue = calculateFutureValue(optimalPoint["Net Cash Savings"], investmentReturnRate, year);
+            values.push(futureValue);
+        }
+
+        return new Chart(canvasEl.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [{
+                    label: 'Investment Value',
+                    data: values,
+                    borderColor: '#10B981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: 'rgba(16, 185, 129, 0.8)',
+                    pointRadius: 3,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Years' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Investment Value' },
+                        ticks: {
+                            callback: value => currencyFormatter.format(value)
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Value: ${currencyFormatter.format(context.parsed.y)}`;
+                            },
+                            title: function(context) {
+                                return `Year ${context[0].label}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+
+    // --- Main Execution ---
+    function runAnalysis() {
+        const totalIncome = parseFloat(wagesEl.value) +
+                            parseFloat(sCorpIncomeEl.value) +
+                            parseFloat(interestDividendsEl.value) +
+                            parseFloat(capitalGainsEl.value) +
+                            parseFloat(k1mhpEl.value);
+
+        const inputs = {
+            PRE_INVESTMENT_TAXABLE_INCOME: totalIncome,
+            FEDERAL_TAX_RATE: parseFloat(federalTaxRateEl.value) / 100,
+            STATE_TAX_RATE: parseFloat(stateTaxRateEl.value) / 100,
+            LEVERAGE_RATIO: parseFloat(leverageRatioEl.value),
+            ITC_RATE: parseFloat(itcRateEl.value) / 100,
+            ITC_LIABILITY_CAP_RATE: parseFloat(itcLiabilityCapRateEl.value) / 100,
+            STATE_DEPRECIATION_RATE: parseFloat(stateDepreciationRateEl.value) / 100
+        };
+
+        // Scenario 1: 100%
+        const bonusRate100 = 1.0;
+        const { optimalPoint: optimal100, allResults: df_100 } = findOptimalInvestment(bonusRate100, inputs);
+        displayResults(results100El, optimal100);
+        chart100 = renderChart(chart100, chart100El, df_100, optimal100);
+
+        // Scenario 2: Custom
+        const bonusRateCustom = parseFloat(bonusDepreciationRateCustomEl.value) / 100;
+        const { optimalPoint: optimalCustom, allResults: df_custom } = findOptimalInvestment(bonusRateCustom, inputs);
+        displayResults(resultsCustomEl, optimalCustom);
+        chartCustom = renderChart(chartCustom, chartCustomEl, df_custom, optimalCustom);
+
+        // 20-Year Projection - use the 100% scenario optimal point
+        display20YearResults(results20YearEl, optimal100, inputs);
+        chart20Year = render20YearChart(chart20Year, chart20YearEl, optimal100, inputs);
+    }
+    
+    // --- Event Listeners ---
+    calculateBtn.addEventListener('click', runAnalysis);
+    // Also re-calculate when the custom bonus rate changes
+    bonusDepreciationRateCustomEl.addEventListener('change', runAnalysis);
+    // Re-calculate when investment return rate changes
+    investmentReturnRateEl.addEventListener('change', runAnalysis);
+
+    // Modal Listeners
+    openModalBtn.addEventListener('click', () => {
+        modal.style.display = 'flex';
+    });
+    closeModalBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // Initial run on page load
+    window.onload = runAnalysis;
+
+</script>
+</body>
+</html>
