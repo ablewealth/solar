@@ -243,6 +243,12 @@
             font-family: monospace;
             font-size: 0.85rem;
         }
+        .scenario2-container {
+            transition: all 0.3s ease;
+        }
+        .scenario2-container.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -260,7 +266,7 @@
         </div>
 
         <!-- Main Grid Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
             
             <!-- Left Column: Inputs -->
             <div class="lg:col-span-1">
@@ -320,6 +326,16 @@
                     </div>
 
                     <div>
+                        <h2 class="text-lg font-semibold border-b pb-2 mb-4">Display Options</h2>
+                        <div class="input-group">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" id="showScenario2" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm font-medium text-gray-700">Show Scenario 2 (Custom Depreciation)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
                         <h2 class="text-lg font-semibold border-b pb-2 mb-4">⚙️ Deal Structure</h2>
                         <div class="input-row">
                             <div class="input-group">
@@ -352,7 +368,7 @@
             </div>
 
             <!-- Right Column: Results -->
-            <div class="lg:col-span-2 space-y-8">
+            <div class="lg:col-span-4 space-y-8">
                 <!-- Scenario 1: 100% Bonus Depreciation -->
                 <div class="card">
                     <h2 class="text-2xl font-bold mb-4">Scenario 1: 100% Bonus Depreciation</h2>
@@ -367,7 +383,7 @@
                 </div>
 
                 <!-- Scenario 2: Custom Bonus Depreciation -->
-                <div class="card">
+                <div class="card scenario2-container hidden" id="scenario2Container">
                     <div class="flex flex-wrap justify-between items-center mb-4">
                         <h2 class="text-2xl font-bold">Scenario 2: Custom Bonus Depreciation</h2>
                         <div class="flex items-center space-x-2 mt-2 sm:mt-0">
@@ -521,6 +537,10 @@
     const bonusDepreciationRateCustomEl = document.getElementById('bonusDepreciationRateCustom');
     const investmentReturnRateEl = document.getElementById('investmentReturnRate');
 
+    // Toggle elements
+    const showScenario2El = document.getElementById('showScenario2');
+    const scenario2ContainerEl = document.getElementById('scenario2Container');
+
     // Outputs
     const results100El = document.getElementById('results100');
     const resultsCustomEl = document.getElementById('resultsCustom');
@@ -552,6 +572,15 @@
 
     // Make toggleSection available globally
     window.toggleSection = toggleSection;
+
+    // --- Scenario 2 Toggle Functionality ---
+    function toggleScenario2() {
+        if (showScenario2El.checked) {
+            scenario2ContainerEl.classList.remove('hidden');
+        } else {
+            scenario2ContainerEl.classList.add('hidden');
+        }
+    }
 
 
     let chart100, chartCustom, chart20Year;
@@ -1005,6 +1034,8 @@
     bonusDepreciationRateCustomEl.addEventListener('change', runAnalysis);
     // Re-calculate when investment return rate changes
     investmentReturnRateEl.addEventListener('change', runAnalysis);
+    // Toggle Scenario 2 visibility
+    showScenario2El.addEventListener('change', toggleScenario2);
 
     // Modal Listeners
     openModalBtn.addEventListener('click', () => {
