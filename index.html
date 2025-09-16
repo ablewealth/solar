@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Energy Solutions</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h1>☀️ Solar</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h2>Harness the Power of the Sun</h2>
+                <p>Transform your home with clean, renewable solar energy solutions</p>
+                <button class="cta-button" onclick="scrollToSection('services')">Get Started</button>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <h2>About Solar Energy</h2>
+                <div class="about-grid">
+                    <div class="about-item">
+                        <h3>🌱 Eco-Friendly</h3>
+                        <p>Solar energy is a clean, renewable source that reduces carbon footprint</p>
+                    </div>
+                    <div class="about-item">
+                        <h3>💰 Cost Effective</h3>
+                        <p>Save money on electricity bills with long-term solar solutions</p>
+                    </div>
+                    <div class="about-item">
+                        <h3>🔋 Reliable</h3>
+                        <p>Modern solar panels provide consistent energy for decades</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="services" class="services">
+            <div class="container">
+                <h2>Our Services</h2>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <h3>Residential Solar</h3>
+                        <p>Complete solar panel installation for homes</p>
+                        <ul>
+                            <li>Custom design consultation</li>
+                            <li>Professional installation</li>
+                            <li>Monitoring and maintenance</li>
+                        </ul>
+                    </div>
+                    <div class="service-card">
+                        <h3>Commercial Solar</h3>
+                        <p>Large-scale solar solutions for businesses</p>
+                        <ul>
+                            <li>Energy efficiency analysis</li>
+                            <li>Scalable solar systems</li>
+                            <li>ROI optimization</li>
+                        </ul>
+                    </div>
+                    <div class="service-card">
+                        <h3>Solar Maintenance</h3>
+                        <p>Keep your solar system running efficiently</p>
+                        <ul>
+                            <li>Regular inspections</li>
+                            <li>Performance monitoring</li>
+                            <li>Repair services</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2>Contact Us</h2>
+                <div class="contact-content">
+                    <div class="contact-info">
+                        <h3>Get in Touch</h3>
+                        <p>Ready to start your solar journey? Contact us today!</p>
+                        <div class="contact-details">
+                            <p>📧 info@solar.com</p>
+                            <p>📞 (555) 123-SOLAR</p>
+                            <p>📍 123 Solar Street, Green City, GC 12345</p>
+                        </div>
+                    </div>
+                    <form class="contact-form" onsubmit="handleSubmit(event)">
+                        <input type="text" placeholder="Your Name" required>
+                        <input type="email" placeholder="Your Email" required>
+                        <textarea placeholder="Your Message" rows="5" required></textarea>
+                        <button type="submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Solar Energy Solutions. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
