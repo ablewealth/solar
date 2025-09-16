@@ -341,10 +341,6 @@
                                 <input type="number" id="stateDepreciationRate" value="20" step="1">
                             </div>
                         </div>
-                        <div class="input-group">
-                            <label for="investmentReturnRate">Investment Return Rate (% annually)</label>
-                            <input type="number" id="investmentReturnRate" value="8" step="0.1">
-                        </div>
                     </div>
                     
                     <button id="calculateBtn" class="btn-primary">Calculate Optimal Investment</button>
@@ -470,18 +466,6 @@
                 <h4>Total Taxes Due</h4>
                 <p><strong>What it means:</strong> The combined total of your final federal and state tax bills after all solar-related benefits.</p>
                 <p><strong>How it's calculated:</strong> <code>Federal Taxes Due + State Taxes Due</code></p>
-
-                <h4>Future Value of Investment (20 yrs)</h4>
-                <p><strong>What it means:</strong> The projected value of your Net Cash Savings if invested at the specified annual return rate for 20 years.</p>
-                <p><strong>How it's calculated:</strong> <code>Net Cash Savings × (1 + Investment Return Rate)^20</code></p>
-
-                <h4>Tax on Note Payable</h4>
-                <p><strong>What it means:</strong> The total tax liability on the Note Payable amount, combining both federal and state tax rates.</p>
-                <p><strong>How it's calculated:</strong> <code>Note Payable × (Federal Tax Rate + State Tax Rate)</code></p>
-
-                <h4>Net 20-Year Value</h4>
-                <p><strong>What it means:</strong> The final net benefit after 20 years, accounting for the growth of your invested cash savings minus the tax obligation on the note.</p>
-                <p><strong>How it's calculated:</strong> <code>Future Value of Investment (20 yrs) - Tax on Note Payable</code></p>
             </div>
         </div>
     </div>
@@ -502,7 +486,6 @@
     const itcRateEl = document.getElementById('itcRate');
     const itcLiabilityCapRateEl = document.getElementById('itcLiabilityCapRate');
     const stateDepreciationRateEl = document.getElementById('stateDepreciationRate');
-    const investmentReturnRateEl = document.getElementById('investmentReturnRate');
     const bonusDepreciationRateCustomEl = document.getElementById('bonusDepreciationRateCustom');
 
     // Outputs
@@ -550,8 +533,7 @@
     function calculateSolarSavings(equityContribution, bonusDepreciationRate, inputs) {
         const {
             PRE_INVESTMENT_TAXABLE_INCOME, FEDERAL_TAX_RATE, STATE_TAX_RATE,
-            LEVERAGE_RATIO, ITC_RATE, ITC_LIABILITY_CAP_RATE, STATE_DEPRECIATION_RATE,
-            INVESTMENT_RETURN_RATE
+            LEVERAGE_RATIO, ITC_RATE, ITC_LIABILITY_CAP_RATE, STATE_DEPRECIATION_RATE
         } = inputs;
 
         const total_assets = equityContribution * LEVERAGE_RATIO;
@@ -600,11 +582,6 @@
         const final_state_tax_due = (PRE_INVESTMENT_TAXABLE_INCOME - state_depreciation_deduction) * STATE_TAX_RATE;
         const total_taxes_due = final_federal_liability_after_credit + final_state_tax_due;
 
-        // New 20-year investment calculations
-        const future_value_investment = net_cash_savings * Math.pow(1 + INVESTMENT_RETURN_RATE, 20);
-        const note_tax = notePayable * (FEDERAL_TAX_RATE + STATE_TAX_RATE);
-        const net_20_year_value = future_value_investment - note_tax;
-
         
         return {
             "Equity Contribution": equityContribution,
@@ -621,10 +598,7 @@
             "Net Cash Savings": net_cash_savings,
             "Federal Taxes Due": final_federal_liability_after_credit,
             "State Taxes Due": final_state_tax_due,
-            "Total Taxes Due": total_taxes_due,
-            "Future Value of Investment (20 yrs)": future_value_investment,
-            "Tax on Note": note_tax,
-            "Net 20-Year Value": net_20_year_value
+            "Total Taxes Due": total_taxes_due
         };
     }
 
@@ -714,22 +688,6 @@
                 <div class="result-item highlight">
                     <span>💵 Net Cash Savings</span>
                     <span>${currencyFormatter.format(optimalPoint["Net Cash Savings"])}</span>
-                </div>
-            </div>
-
-            <div class="result-section">
-                <h3>📈 20-Year Investment Projection</h3>
-                <div class="result-item">
-                    <span>Future Value of Investment</span>
-                    <span>${currencyFormatter.format(optimalPoint["Future Value of Investment (20 yrs)"])}</span>
-                </div>
-                <div class="result-item">
-                    <span>Tax on Note Payable</span>
-                    <span>${currencyFormatter.format(optimalPoint["Tax on Note"])}</span>
-                </div>
-                <div class="result-item highlight">
-                    <span>🎯 Net 20-Year Value</span>
-                    <span>${currencyFormatter.format(optimalPoint["Net 20-Year Value"])}</span>
                 </div>
             </div>
             
@@ -838,8 +796,7 @@
             LEVERAGE_RATIO: parseFloat(leverageRatioEl.value),
             ITC_RATE: parseFloat(itcRateEl.value) / 100,
             ITC_LIABILITY_CAP_RATE: parseFloat(itcLiabilityCapRateEl.value) / 100,
-            STATE_DEPRECIATION_RATE: parseFloat(stateDepreciationRateEl.value) / 100,
-            INVESTMENT_RETURN_RATE: parseFloat(investmentReturnRateEl.value) / 100
+            STATE_DEPRECIATION_RATE: parseFloat(stateDepreciationRateEl.value) / 100
         };
 
         // Scenario 1: 100%
@@ -859,8 +816,6 @@
     calculateBtn.addEventListener('click', runAnalysis);
     // Also re-calculate when the custom bonus rate changes
     bonusDepreciationRateCustomEl.addEventListener('change', runAnalysis);
-    // Also re-calculate when the investment return rate changes
-    investmentReturnRateEl.addEventListener('change', runAnalysis);
 
     // Modal Listeners
     openModalBtn.addEventListener('click', () => {
